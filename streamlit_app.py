@@ -1,96 +1,162 @@
-import matplotlib.pyplot as plt
-import numpy as np
+## Step 00 - Import of the packages
+
 import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
+import numpy as np
+import sklearn
 
-# ==============================================================================
-# 0. Page Configuration
-# ==============================================================================
+from ydata_profiling import ProfileReport
+from streamlit_pandas_profiling import st_profile_report
+
 st.set_page_config(
-    page_title="College Major ROI Analytics", page_icon="🎓", layout="wide"
+    page_title="Califronia Housing Dashboard 🏡",
+    layout="centered",
+    page_icon="🏡",
 )
 
-# Style
-sns.set_theme(style="whitegrid")
+
+## Step 01 - Setup
+st.sidebar.title("California - Real Estate Agency 🏡")
+page = st.sidebar.selectbox("Select Page",["Introduction 📘","Visualization 📊", "Automated Report 📑","Prediction"])
 
 
-# 1. load and process the data
-@st.cache_data #streamlit dont need to reread the data when everytime it runs
-def load_and_preprocess_data():
-    df = pd.read_csv("college_major_roi.csv")
-    # add a new column "roi_ratio"
-    df["roi_ratio"] = np.where(
-        df["net_cost_usd"] > 0, df["earnings_10yr_usd"] / df["net_cost_usd"], 0
-    )
-    return df
+#st.video("video.mp4")
+
+st.image("house2.png")
+
+st.write("   ")
+st.write("   ")
+st.write("   ")
+df = pd.read_csv("housing.csv")
 
 
-df = load_and_preprocess_data()
+## Step 02 - Load dataset
+if page == "Introduction 📘":
 
-# ==============================================================================
-# 1.Sidebar
-# ==============================================================================
-st.sidebar.title("🎓 Navigation")
-page = st.sidebar.radio(
-    "Select Page:",
-    [
-        "1. Society Case & Data Presentation",
-        "2. Data Visualization & Insights",
-        "3. Model Prediction & Decision Support",
-    ],
-)
+    st.subheader("01 Introduction 📘")
 
-# PAGE 1: Business Case & Data Presentation
-if page == "1. Business Case & Data Presentation":
-    st.title("💡 College Major ROI")
-    st.subheader(
-        "Understanding the Financial Return of Higher Education"
-    )
+    st.markdown("##### Data Preview")
+    rows = st.slider("Select a number of rows to display",5,20,5)
+    st.dataframe(df.head(rows))
+
+    st.markdown("##### Missing values")
+    missing = df.isnull().sum()
+    st.write(missing)
+
+    if missing.sum() == 0:
+        st.success("✅ No missing values found")
+    else:
+        st.warning("⚠️ you have missing values")
+
+    st.markdown("##### 📈 Summary Statistics")
+    if st.button("Show Describe Table"):
+        st.dataframe(df.describe())
+
+elif page == "Visualization 📊":
+
+    ## Step 03 - Data Viz
+    st.subheader("02 Data Viz")
+
+    col_x = st.selectbox("Select X-axis variable",df.columns,index=0)
+    col_y = st.selectbox("Select Y-axis variable",df.columns,index=1)
+
+    tab1, tab2, tab3 = st.tabs(["Bar Chart 📊","Line Chart 📈","Correlation Heatmap 🔥"])
+
+    with tab1:
+        st.subheader("Bar Chart")
+        st.bar_chart(df[[col_x,col_y]].sort_values(by=col_x),use_container_width=True)
+
+    with tab2:
+        st.subheader("Line Chart")
+        st.line_chart(df[[col_x,col_y]].sort_values(by=col_x),use_container_width=True)
 
 
-    st.markdown("""
-    ### Business Problem
+    with tab3:
+        st.subheader("Correlation Matrix")
+        df_numeric = df.select_dtypes(include=np.number)
 
-    Choosing a college major is an important decision.
-    Students need to consider future earnings, education costs,
-    student debt, and other factors when evaluating their options.
+        fig_corr, ax_corr = plt.subplots(figsize=(18,14))
+        # create the plot, in this case with seaborn 
+        sns.heatmap(df_numeric.corr(),annot=True,fmt=".2f",cmap='coolwarm')
+        ## render the plot in streamlit 
+        st.pyplot(fig_corr)
 
-    ### Project Goal
+elif page == "Automated Report 📑":
+    st.subheader("03 Automated Report")
+    if st.button("Generate Report"):
+        with st.spinner("Generating report..."):
+            profile = ProfileReport(df,title="California Housing Report",explorative=True,minimal=True)
+            st_profile_report(profile)
 
-    Our goal is to explore which factors are associated with
-    the financial return of a college major and use linear
-    regression to predict a key financial outcome.
+        export = profile.to_html()
+        st.download_button(label="📥 Download full Report",data=export,file_name="california_housing_report.html",mime='text/html')
 
-    ### Dataset Overview
 
-    This dataset contains information about 30,000 graduates,
-    including their majors, institution types, GPA, internship
-    experience, education costs, debt, earnings, and ROI.
-    """)
+elif page == "Prediction":
+    st.subheader("04 Prediction with Linear Regression")
+    df2 = pd.read_csv("housing.csv")
+    ## Data Preprocessing
 
-    st.markdown("---")
-    st.subheader("📊 Key Metrics Overview")
+    ### removing missing values 
+    df2 = df2.dropna()
 
-    st.write(
-        f"The dataset contains **{df.shape[0]:,}** graduate records across **{df.shape[1]}** features."
-    )
+    ### Label Encoder to change text categories into number categories
+    from sklearn.preprocessing import LabelEncoder
+    le = LabelEncoder()
 
-    # Key Summary Statistics calculated using NumPy
-    mean_earnings = np.mean(df["earnings_10yr_usd"])
-    mean_roi = np.mean(df["net_roi_usd"])
-    avg_cost = np.mean(df["net_cost_usd"])
-    internship_rate = np.mean(df["had_internship"]) * 100
+    df2["ocean_proximity"] = le.fit_transform(df2["ocean_proximity"])
 
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Avg. 10-Year Earnings", f"${mean_earnings:,.0f}")
-    c2.metric("Avg. 10-Year Net ROI", f"${mean_roi:,.0f}")
-    c3.metric("Avg. Total Net Cost", f"${avg_cost:,.0f}")
-    c4.metric("Internship Participation Rate", f"{internship_rate:.1f}%")
+    list_var = list(df2.columns)
 
-    st.markdown("##### Dataset Preview")
-    st.dataframe(df.head(10), use_container_width=True)
+    features_selection = st.sidebar.multiselect("Select Features (X)",list_var,default=list_var)
+    target_selection  = st.sidebar.selectbox("Select target variable (Y))",list_var)
+    selected_metrics = st.sidebar.multiselect("Metrics to display", ["Mean Squared Error (MSE)","Mean Absolute Error (MAE)","R² Score"],default=["Mean Absolute Error (MAE)"])
 
+    ### i) X and y
+    X = df2[features_selection]
+    y = df2[target_selection]
+
+    st.dataframe(X.head())
+    st.dataframe(y.head())
+
+    ### ii) train_test_split
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2)
+
+
+    ## Model 
+
+    ### i) Definition model
+    from sklearn.linear_model import LinearRegression
+    model = LinearRegression()
+
+    ### ii) Training model
+    model.fit(X_train,y_train)
+
+    ### iii) Prediction
+    predictions = model.predict(X_test)
+
+    ### iv) Evaluation 
+    from sklearn import metrics 
+    if "Mean Squared Error (MSE)" in selected_metrics:
+        mse = metrics.mean_squared_error(y_test, predictions)
+        st.write(f"- **MSE** {mse:,.2f}")
+    if "Mean Absolute Error (MAE)" in selected_metrics:
+        mae = metrics.mean_absolute_error(y_test, predictions)
+        st.write(f"- **MAE** {mae:,.2f}")
+    if "R² Score" in selected_metrics:
+        r2 = metrics.r2_score(y_test, predictions)
+        st.write(f"- **R2** {r2:,.3f}")
+
+    st.success(f"My model performance is of ${np.round(mae,2)}")
+
+    fig, ax = plt.subplots()
+    ax.scatter(y_test,predictions,alpha=0.5)
+    ax.plot([y_test.min(),y_test.max()],
+           [y_test.min(),y_test.max() ],"--r",linewidth=2)
+    ax.set_xlabel("Actual")
+    ax.set_xlabel("Predicted")
+    ax.set_title("Actual vs Predicted")
+    st.pyplot(fig)

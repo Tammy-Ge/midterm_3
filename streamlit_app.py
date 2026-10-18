@@ -19,7 +19,6 @@ st.set_page_config(
 ## Step 01 - Setup
 st.sidebar.title("College Major ROI Explore")
 page = st.sidebar.selectbox("Select Page",["Introduction 📘","Visualization 📊","Prediction 📈"])
-py -3.12 -m streamlit run streamlit_app.py
 
 #st.video("video.mp4")
 

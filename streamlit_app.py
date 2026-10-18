@@ -20,7 +20,6 @@ st.set_page_config(
 st.sidebar.title("College Major ROI Explore")
 page = st.sidebar.selectbox("Select Page",["Introduction 📘","Visualization 📊","Prediction 📈"])
 
-
 #st.video("video.mp4")
 
 st.image("college.png")
@@ -80,7 +79,7 @@ elif page == "Visualization 📊":
         sns.heatmap(df_numeric.corr(), annot=True, fmt=".2f", cmap="coolwarm", ax=ax_corr)
         st.pyplot(fig_corr)
 
-elif page == "Prediction":
+elif page == "Prediction 📈":
     st.subheader("04 Prediction with Linear Regression")
     df2 = pd.read_csv("college_major_roi.csv")
     ## Data Preprocessing

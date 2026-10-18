@@ -20,7 +20,7 @@ st.set_page_config(
 ## Step 01 - Setup
 st.sidebar.title("College Major ROI Explore")
 page = st.sidebar.selectbox("Select Page",["Introduction 📘","Visualization 📊","Prediction 📈"])
-
+py -3.12 -m streamlit run streamlit_app.py
 
 #st.video("video.mp4")
 
@@ -83,7 +83,7 @@ elif page == "Visualization 📊":
         ## render the plot in streamlit 
         st.pyplot(fig_corr)
 
-elif page == "Prediction":
+elif page == "Prediction 📈":
     st.subheader("04 Prediction with Linear Regression")
     df2 = pd.read_csv("college_major_roi.csv")
     ## Data Preprocessing

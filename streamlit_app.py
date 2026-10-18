@@ -54,31 +54,29 @@ if page == "Introduction 📘":
 
 elif page == "Visualization 📊":
 
-    ## Step 03 - Data Viz
-    st.subheader("02 Data Viz")
+    st.subheader("02 College Major ROI Data Viz")
 
-    col_x = st.selectbox("Select X-axis variable",df.columns,index=0)
-    col_y = st.selectbox("Select Y-axis variable",df.columns,index=1)
+    col_x = st.selectbox("Select X-axis variable", ["major", "major_category", "institution_tier", "region"])
+    col_y = st.selectbox("Select Y-axis variable", ["net_roi_usd", "earnings_10yr_usd", "net_cost_usd", "debt_usd"])
 
-    tab1, tab2, tab3 = st.tabs(["Bar Chart 📊","Line Chart 📈","Correlation Heatmap 🔥"])
+    tab1, tab2, tab3 = st.tabs(["Bar Chart 📊", "Line Chart 📈", "Correlation Heatmap 🔥"])
+
+    chart_data = df.groupby(col_x)[col_y].mean()
 
     with tab1:
         st.subheader("Bar Chart")
-        st.bar_chart(df[[col_x,col_y]].sort_values(by=col_x),use_container_width=True)
+        st.bar_chart(chart_data, use_container_width=True)
 
     with tab2:
         st.subheader("Line Chart")
-        st.line_chart(df[[col_x,col_y]].sort_values(by=col_x),use_container_width=True)
-
+        st.line_chart(chart_data, use_container_width=True)
 
     with tab3:
         st.subheader("Correlation Matrix")
         df_numeric = df.select_dtypes(include=np.number)
 
-        fig_corr, ax_corr = plt.subplots(figsize=(18,14))
-        # create the plot, in this case with seaborn 
-        sns.heatmap(df_numeric.corr(),annot=True,fmt=".2f",cmap='coolwarm')
-        ## render the plot in streamlit 
+        fig_corr, ax_corr = plt.subplots(figsize=(18, 14))
+        sns.heatmap(df_numeric.corr(), annot=True, fmt=".2f", cmap="coolwarm", ax=ax_corr)
         st.pyplot(fig_corr)
 
 elif page == "Prediction 📈":

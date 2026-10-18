@@ -11,25 +11,25 @@ from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 
 st.set_page_config(
-    page_title="Califronia Housing Dashboard 🏡",
+    page_title="College Major ROI Explore 🎓",
     layout="centered",
-    page_icon="🏡",
+    page_icon=" 🎓 ",
 )
 
 
 ## Step 01 - Setup
-st.sidebar.title("California - Real Estate Agency 🏡")
-page = st.sidebar.selectbox("Select Page",["Introduction 📘","Visualization 📊", "Automated Report 📑","Prediction"])
+st.sidebar.title("College Major ROI Explore")
+page = st.sidebar.selectbox("Select Page",["Introduction 📘","Visualization 📊","Prediction 📈"])
 
 
 #st.video("video.mp4")
 
-st.image("house2.png")
+st.image("college.png")
 
 st.write("   ")
 st.write("   ")
 st.write("   ")
-df = pd.read_csv("housing.csv")
+df = pd.read_csv("college_major_roi.csv")
 
 
 ## Step 02 - Load dataset
@@ -83,18 +83,7 @@ elif page == "Visualization 📊":
         ## render the plot in streamlit 
         st.pyplot(fig_corr)
 
-elif page == "Automated Report 📑":
-    st.subheader("03 Automated Report")
-    if st.button("Generate Report"):
-        with st.spinner("Generating report..."):
-            profile = ProfileReport(df,title="California Housing Report",explorative=True,minimal=True)
-            st_profile_report(profile)
-
-        export = profile.to_html()
-        st.download_button(label="📥 Download full Report",data=export,file_name="california_housing_report.html",mime='text/html')
-
-
-elif page == "Prediction":
+elif page == "Prediction 📈":
     st.subheader("04 Prediction with Linear Regression")
     df2 = pd.read_csv("housing.csv")
     ## Data Preprocessing

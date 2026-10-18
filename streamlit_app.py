@@ -1,14 +1,14 @@
 ## Step 00 - Import of the packages
-
-import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 import streamlit as st
-import numpy as np
-import sklearn
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 
-from ydata_profiling import ProfileReport
-from streamlit_pandas_profiling import st_profile_report
+
 
 st.set_page_config(
     page_title="College Major ROI Explore 🎓",

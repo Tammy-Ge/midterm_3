@@ -9,7 +9,6 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
 
-
 st.set_page_config(
     page_title="College Major ROI Explore 🎓",
     layout="centered",
@@ -83,9 +82,9 @@ elif page == "Visualization 📊":
         ## render the plot in streamlit 
         st.pyplot(fig_corr)
 
-elif page == "Prediction 📈":
+elif page == "Prediction":
     st.subheader("04 Prediction with Linear Regression")
-    df2 = pd.read_csv("housing.csv")
+    df2 = pd.read_csv("college_major_roi.csv")
     ## Data Preprocessing
 
     ### removing missing values 
@@ -95,7 +94,11 @@ elif page == "Prediction 📈":
     from sklearn.preprocessing import LabelEncoder
     le = LabelEncoder()
 
-    df2["ocean_proximity"] = le.fit_transform(df2["ocean_proximity"])
+    df2["grad_id"] = le.fit_transform(df2["grad_id"])
+    df2["major"] = le.fit_transform(df2["major"])
+    df2["major_category"] = le.fit_transform(df2["major_category"])
+    df2["institution_tier"] = le.fit_transform(df2["institution_tier"])
+    df2["region"] = le.fit_transform(df2["region"])
 
     list_var = list(df2.columns)
 
@@ -139,13 +142,13 @@ elif page == "Prediction 📈":
         r2 = metrics.r2_score(y_test, predictions)
         st.write(f"- **R2** {r2:,.3f}")
 
-    st.success(f"My model performance is of ${np.round(mae,2)}")
+
 
     fig, ax = plt.subplots()
     ax.scatter(y_test,predictions,alpha=0.5)
     ax.plot([y_test.min(),y_test.max()],
            [y_test.min(),y_test.max() ],"--r",linewidth=2)
     ax.set_xlabel("Actual")
-    ax.set_xlabel("Predicted")
+    ax.set_ylabel("Predicted")
     ax.set_title("Actual vs Predicted")
     st.pyplot(fig)

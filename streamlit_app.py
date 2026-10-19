@@ -107,8 +107,17 @@ elif page == "Prediction 📈":
     X = df2[features_selection]
     y = df2[target_selection]
 
-    st.dataframe(X.head())
-    st.dataframe(y.head())
+    st.markdown("### Model Inputs & Target")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("**Input Features (X)**")
+        st.dataframe(X.head(), hide_index=True)
+
+    with col2:
+        st.markdown("**Prediction Target (Y)**")
+        st.dataframe(y.head(), hide_index=True)
 
     ### ii) train_test_split
     from sklearn.model_selection import train_test_split
@@ -128,17 +137,21 @@ elif page == "Prediction 📈":
     predictions = model.predict(X_test)
 
     ### iv) Evaluation 
-    from sklearn import metrics 
+    from sklearn import metrics
+
+    st.markdown("### Model Performance")
+
     if "Mean Squared Error (MSE)" in selected_metrics:
         mse = metrics.mean_squared_error(y_test, predictions)
-        st.write(f"- **MSE** {mse:,.2f}")
+        st.metric("Mean Squared Error", f"{mse:,.2f}")
+
     if "Mean Absolute Error (MAE)" in selected_metrics:
         mae = metrics.mean_absolute_error(y_test, predictions)
-        st.write(f"- **MAE** {mae:,.2f}")
+        st.metric("Mean Absolute Error", f"${mae:,.2f}")
+
     if "R² Score" in selected_metrics:
         r2 = metrics.r2_score(y_test, predictions)
-        st.write(f"- **R2** {r2:,.3f}")
-
+        st.metric("R² Score", f"{r2:.3f}")
 
 
     fig, ax = plt.subplots()

@@ -78,6 +78,12 @@ elif page == "Visualization 📊":
 
     st.subheader("02 College Major ROI Data Viz")
 
+    st.write("""
+    Explore how college majors, institution types, and regions
+    relate to education costs, debt, future earnings, and ROI.
+    Use the selectors below to compare different financial outcomes.
+    """)
+
     col_x = st.selectbox("Select X-axis variable", ["major", "major_category", "institution_tier", "region"])
     col_y = st.selectbox("Select Y-axis variable", ["net_roi_usd", "earnings_10yr_usd", "net_cost_usd", "debt_usd"])
 
@@ -86,15 +92,15 @@ elif page == "Visualization 📊":
     chart_data = df.groupby(col_x)[col_y].mean()
 
     with tab1:
-        st.subheader("Bar Chart")
+        st.subheader(f"Average *{col_y}* by *{col_x}*")
         st.bar_chart(chart_data, use_container_width=True)
 
     with tab2:
-        st.subheader("Line Chart")
+        st.subheader(f"Average *{col_y}* by *{col_x}*")
         st.line_chart(chart_data, use_container_width=True)
 
     with tab3:
-        st.subheader("Correlation Matrix")
+        st.subheader(f"Average *{col_y}* by *{col_x}*")
         df_numeric = df.select_dtypes(include=np.number)
 
         fig_corr, ax_corr = plt.subplots(figsize=(18, 14))

@@ -35,9 +35,31 @@ if page == "Introduction 📘":
 
     st.subheader("01 Introduction 📘")
 
+    ## Explain buisness goal
+    st.markdown("### Is Your College Degree Worth the Investment?")
+
+    st.write("Choosing a college major is a major financial decision. Our project explores how college majors, education costs, and student characteristics relate to long-term earnings and return on investment (ROI).")
+
+    st.info("Our goal: Help students make more informed financial decisions when choosing a college major.")
+
+    st.divider()
+
+
+    ##Show some nice simplke info cards
+    col1, col2, col3 = st.columns(3)
+
+    col1.metric("Total Graduates", f"{len(df):,}")
+    col2.metric("Average College Cost", f"${df['net_cost_usd'].mean():,.0f}")
+    col3.metric("Average 10-Year Earnings", f"${df['earnings_10yr_usd'].mean():,.0f}")
+
+    st.divider()
+
+
     st.markdown("##### Data Preview")
     rows = st.slider("Select a number of rows to display",5,20,5)
-    st.dataframe(df.head(rows))
+
+    #Beutifying the .head a little with cont width and hide index
+    st.dataframe(df.head(rows), use_container_width=True, hide_index=True)
 
     st.markdown("##### Missing values")
     missing = df.isnull().sum()
